@@ -2,6 +2,23 @@
 
 # Parameters.
 parameters:
+  cops-cli.amqp.host: 'rabbitmq'
+  cops-cli.amqp.port: '5672'
+  cops-cli.amqp.username: 'username'
+  cops-cli.amqp.password: 'password'
+  cops-cli.amqp.queue: 'cops-cli'
+
+  cops-cli.amqp.declare.exchange: ''
+  cops-cli.amqp.declare.routing: 'cops-cli'
+  cops-cli.amqp.declare.consumer-tag: ''
+  cops-cli.amqp.declare.passive: false
+  cops-cli.amqp.declare.durable: true
+  cops-cli.amqp.declare.exclusive: false
+  cops-cli.amqp.declare.auto-delete: false
+  cops-cli.amqp.declare.i-no-local: false
+  cops-cli.amqp.declare.is-no-ack: false
+  cops-cli.amqp.declare.is-no-wait: false
+
   cops.cli.monolog.name: 'cops-cli'
   cops.cli.monolog.bubble: false
   cops.cli.monolog.stream-handler.info.path: 'var/log/info.log'
@@ -28,10 +45,28 @@ services:
     public: true
     arguments:
       - !tagged command
-      -
+
   # Classes without interfaces.
   LeadGenerator\Generator:
     class: LeadGenerator\Generator
+
+  PhpAmqpLib\Message\AMQPMessage:
+    class: PhpAmqpLib\Message\AMQPMessage
+
+  Cops\Cli\Messenger\Amqp\Receiver\QueueDeclare:
+    class: Cops\Cli\Messenger\Amqp\Receiver\QueueDeclare
+    arguments:
+      $exchange: '%cops-cli.amqp.declare.exchange%'
+      $routing: '%cops-cli.amqp.declare.routing%'
+      $query: '%cops-cli.amqp.queue%'
+      $consumerTag: '%cops-cli.amqp.declare.consumer-tag%'
+      $passive: '%cops-cli.amqp.declare.passive%'
+      $durable: '%cops-cli.amqp.declare.durable%'
+      $exclusive: '%cops-cli.amqp.declare.exclusive%'
+      $autoDelete: '%cops-cli.amqp.declare.auto-delete%'
+      $isNoLocal: '%cops-cli.amqp.declare.i-no-local%'
+      $isNoAck: '%cops-cli.amqp.declare.is-no-ack%'
+      $isNoWait: '%cops-cli.amqp.declare.is-no-wait%'
 
   # Logging settings.
   monolog.stream-handler.info:
@@ -55,3 +90,19 @@ services:
       $handlers:
         - '@monolog.stream-handler.info'
         - '@monolog.stream-handler.error'
+
+  # Connection to amqp.
+  PhpAmqpLib\Connection\AMQPStreamConnection:
+    class: PhpAmqpLib\Connection\AMQPStreamConnection
+    arguments:
+      $host: '%cops-cli.amqp.host%'
+      $port: '%cops-cli.amqp.port%'
+      $user: '%cops-cli.amqp.username%'
+      $password: '%cops-cli.amqp.password%'
+
+  Cops\Cli\Messenger\Amqp\TransportInterface:
+    class: Cops\Cli\Messenger\Amqp\Transport
+    public: true
+    arguments:
+      $connection: '@PhpAmqpLib\Connection\AMQPStreamConnection'
+    tags: ['transport']
