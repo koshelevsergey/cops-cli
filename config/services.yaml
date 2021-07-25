@@ -2,6 +2,12 @@
 
 # Parameters.
 parameters:
+  cops.cli.monolog.name: 'cops-cli'
+  cops.cli.monolog.bubble: false
+  cops.cli.monolog.stream-handler.info.path: 'var/log/info.log'
+  cops.cli.monolog.stream-handler.error.path: 'var/log/error.log'
+  cops.cli.monolog.level.info: '200'
+  cops.cli.monolog.level.error: '400'
 
 # Services
 services:
@@ -26,3 +32,26 @@ services:
   # Classes without interfaces.
   LeadGenerator\Generator:
     class: LeadGenerator\Generator
+
+  # Logging settings.
+  monolog.stream-handler.info:
+    class: Monolog\Handler\StreamHandler
+    arguments:
+      $stream: '%cops.cli.monolog.stream-handler.info.path%'
+      $level: '%cops.cli.monolog.level.info%'
+      $bubble: '%cops.cli.monolog.bubble%'
+
+  monolog.stream-handler.error:
+    class: Monolog\Handler\StreamHandler
+    arguments:
+      $stream: '%cops.cli.monolog.stream-handler.error.path%'
+      $level: '%cops.cli.monolog.level.error%'
+      $bubble: '%cops.cli.monolog.bubble%'
+
+  Psr\Log\LoggerInterface:
+    class: Monolog\Logger
+    arguments:
+      $name: '%cops.cli.monolog.name%'
+      $handlers:
+        - '@monolog.stream-handler.info'
+        - '@monolog.stream-handler.error'
