@@ -1,0 +1,24 @@
+# Basic application configuration.
+
+# Parameters.
+parameters:
+
+# Services
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  # Automatic loading of console commands.
+  _instanceof:
+    Symfony\Component\Console\Command\Command:
+      tags: [ 'command' ]
+
+  Cops\Cli\:
+    resource: '../src/*'
+
+  Cops\Cli\Application:
+    public: true
+    arguments:
+      - !tagged command
