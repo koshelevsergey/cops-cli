@@ -4,10 +4,7 @@ namespace Cops\Cli\Command\Client\Order;
 
 use Cops\Cli\UseCase\Client\Order\Receipt\HandlerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -22,7 +19,7 @@ class ReceiptCommand extends Command
     private const COUNT_ORDERS = 10000;
 
     /** @var string */
-    protected static $defaultName = 'client:order:receipt, --count';
+    protected static $defaultName = 'client:order:receipt';
 
     /** @var HandlerInterface */
     private HandlerInterface $handler;
@@ -44,15 +41,7 @@ class ReceiptCommand extends Command
      */
     protected function configure(): void
     {
-        $this->setDescription('Receiving and sending client orders to message bus. Default value 10000.');
-
-        $this->addOption(
-            'count',
-            'c',
-            InputArgument::OPTIONAL,
-            'Number of processed orders',
-            self::COUNT_ORDERS
-        );
+        $this->setDescription('Receiving and sending client orders to message bus.');
     }
 
     /**
@@ -65,9 +54,7 @@ class ReceiptCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $this->handler->execute(
-            $input->getOption('count')
-        );
+        $this->handler->execute(self::COUNT_ORDERS);
 
         $io->success("Client orders have been successfully received.");
 

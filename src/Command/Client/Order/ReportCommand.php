@@ -2,6 +2,7 @@
 
 namespace Cops\Cli\Command\Client\Order;
 
+use Cops\Cli\Messenger\Amqp\Consumer\Client\Order\ReportConsumerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,6 +16,21 @@ class ReportCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'client:order:report';
+
+    /** @var ReportConsumerInterface */
+    private ReportConsumerInterface $reportConsumer;
+
+    /**
+     * ProcessCommand constructor.
+     *
+     * @param ReportConsumerInterface $reportConsumer
+     */
+    public function __construct(ReportConsumerInterface $reportConsumer)
+    {
+        $this->reportConsumer = $reportConsumer;
+
+        parent::__construct();
+    }
 
     /**
      * @return void
@@ -32,6 +48,9 @@ class ReportCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->reportConsumer->listener();
+        $this->reportConsumer->close();
+
         return self::SUCCESS;
     }
 }
