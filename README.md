@@ -74,7 +74,7 @@ make client-order-receipt
 docker-compose exec php-fpm php bin/console client:order:receipt
 ```
 
-Подождите около 10 минут и просмотри записи в логах по пути `var/log/*`.
+Подождите около 10 минут и просмотрите записи в логах по пути `var/log/*`.
 
 ## Поддержка
 
