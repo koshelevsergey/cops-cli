@@ -1,0 +1,26 @@
+version: "3.5"
+
+services:
+  php-fpm:
+    build: docker/local/php-fpm
+    container_name: cops-cli-php-fpm
+    working_dir: /app
+    volumes:
+      - .:/app
+      - ./docker/local/php-fpm/php-ini-overrides.ini:/etc/php/7.4/fpm/conf.d/99-overrides.ini
+      - ./docker/local/supervisord/supervisord.conf:/etc/supervisor/supervisord.conf
+      - ./docker/local/supervisord/conf.d/message-bus.conf:/etc/supervisor/conf.d/message-bus.conf
+    command: ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: cops-cli-rabbitmq
+    environment:
+      RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
+      RABBITMQ_DEFAULT_USER: username
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - 5672:5672
+      - 15672:15672
