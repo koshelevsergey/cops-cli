@@ -22,3 +22,7 @@ services:
     public: true
     arguments:
       - !tagged command
+      -
+  # Classes without interfaces.
+  LeadGenerator\Generator:
+    class: LeadGenerator\Generator
